@@ -4,10 +4,11 @@ import subprocess
 from math import floor, ceil
 import json
 from tqdm import tqdm
+import asyncio
 
 BASE_TILE = 256
-SOURCE_IMAGE = "all_paintings.png"
-OUTPUT_DIR = "out/all_paintings"
+SOURCE_IMAGE = "prints_drawings.png"
+OUTPUT_DIR = "out/prints_drawings"
 
 os.makedirs(OUTPUT_DIR)
 
@@ -20,6 +21,7 @@ orig_dims = [
     .split(" ")[2]
     .split("x")
 ]
+
 if orig_dims[0] > orig_dims[1]:
     min_dim = orig_dims[1]
 else:
@@ -37,10 +39,13 @@ while cont:
     p = p + 1
 
 
-im_calls = [
-    f'convert {SOURCE_IMAGE} -monitor -scale {100/sf}% -crop {BASE_TILE}x{BASE_TILE} -set filename:tile "%[fx:page.x],%[fx:page.y],%[fx:w],%[fx:h]" +repage +adjoin "{OUTPUT_DIR}/{BASE_TILE},{sf},%[filename:tile].jpg"'
-    for sf in SCALING_FACTORS
-]
+im_calls = []
+for sf in SCALING_FACTORS:
+    source_w = floor(orig_dims[0] / sf)
+    source_h = ceil(orig_dims[1] / sf)
+    im_calls.append(
+        f'convert {SOURCE_IMAGE} -monitor -adaptive-resize {source_w}x{source_h} -crop {BASE_TILE}x{BASE_TILE} -set filename:tile "%[fx:page.x],%[fx:page.y],%[fx:w],%[fx:h]" +repage +adjoin "{OUTPUT_DIR}/{BASE_TILE},{sf},%[filename:tile].jpg"'
+    )
 
 for call in tqdm(im_calls, desc="Creating tiles"):
     code = os.system(call)
@@ -74,12 +79,15 @@ for i in tqdm(image_results, desc="Full tiles"):
     os.makedirs(target_dir)
     os.rename(i["filename"], target_dir + "/default.jpg")
 
-downsize_calls = [
-    f"convert {SOURCE_IMAGE} -scale {100/pow(2, df)}% {OUTPUT_DIR}/{floor(orig_dims[0]*1/pow(2, df))},{floor(orig_dims[1]*1/pow(2, df))}.jpg"
-    for df in DOWNSIZING_FACTORS
-]
+downsize_calls = []
+for df in DOWNSIZING_FACTORS:
+    new_w = ceil(orig_dims[0] * 1 / pow(2, df))
+    new_h = ceil(orig_dims[1] * 1 / pow(2, df))
+    downsize_calls.append(
+        f"convert {SOURCE_IMAGE} -adaptive-resize {new_w}x{new_h} {OUTPUT_DIR}/{new_w},{new_h}.jpg"
+    )
 
-for call in downsize_calls:
+for call in tqdm(downsize_calls, desc="Downsizing"):
     code = os.system(call)
 
 full_results = glob(OUTPUT_DIR + "/*.jpg")
