@@ -16,3 +16,6 @@ python3 fast_tile.py
 This will create and populate an `out/` directory.
 
 N.b. because several of the Imagemagick utilities called here already utilize multiple cores, returns for running this script in parallel diminish rapidly.
+
+---
+[Matthew Lincoln](https://matthewlincoln.net)
