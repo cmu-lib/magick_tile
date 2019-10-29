@@ -4,7 +4,6 @@ import subprocess
 from math import floor, ceil
 import json
 from tqdm import tqdm
-import asyncio
 
 BASE_TILE = 256
 SOURCE_IMAGE = "prints_drawings.png"
