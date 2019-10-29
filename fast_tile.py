@@ -11,6 +11,8 @@ SOURCE_IMAGE = "prints_drawings.png"
 OUTPUT_DIR = "out/prints_drawings"
 
 os.makedirs(OUTPUT_DIR)
+os.makedirs(OUTPUT_DIR + "/temp_crops")
+os.makedirs(OUTPUT_DIR + "/temp_resizes")
 
 orig_dims = [
     int(d)
@@ -41,10 +43,9 @@ while cont:
 
 im_calls = []
 for sf in SCALING_FACTORS:
-    source_w = floor(orig_dims[0] / sf)
-    source_h = ceil(orig_dims[1] / sf)
+    cropsize = BASE_TILE * sf
     im_calls.append(
-        f'convert {SOURCE_IMAGE} -monitor -adaptive-resize {source_w}x{source_h} -crop {BASE_TILE}x{BASE_TILE} -set filename:tile "%[fx:page.x],%[fx:page.y],%[fx:w],%[fx:h]" +repage +adjoin "{OUTPUT_DIR}/{BASE_TILE},{sf},%[filename:tile].jpg"'
+        f'convert {SOURCE_IMAGE} -monitor -crop {cropsize}x{cropsize} -set filename:tile "%[fx:page.x],%[fx:page.y],%[fx:w],%[fx:h]" +repage +adjoin "{OUTPUT_DIR}/temp_crops/{cropsize},{sf},%[filename:tile].jpg"'
     )
 
 for call in tqdm(im_calls, desc="Creating tiles"):
@@ -52,7 +53,7 @@ for call in tqdm(im_calls, desc="Creating tiles"):
 
 image_results = []
 
-for f in glob(OUTPUT_DIR + "/*.jpg"):
+for f in glob(OUTPUT_DIR + "/temp_crops/*.jpg"):
     attrs = [int(i) for i in os.path.basename(f).split(".")[0].split(",")]
     image_results.append(
         {
@@ -68,29 +69,33 @@ for f in glob(OUTPUT_DIR + "/*.jpg"):
         }
     )
 
-for i in tqdm(image_results, desc="Full tiles"):
+for i in tqdm(image_results, desc="Regularize cropped tiles"):
     attrs = i["attributes"]
     sf = attrs["scaling_factor"]
-    real_x = attrs["x"] * sf
-    real_y = attrs["y"] * sf
-    real_w = attrs["w"] * sf
-    real_h = attrs["h"] * sf
-    target_dir = f"{OUTPUT_DIR}/{real_x},{real_y},{real_w},{real_h}/{attrs['w']},/0"
+    real_x = attrs["x"]
+    real_y = attrs["y"]
+    real_w = attrs["w"]
+    real_h = attrs["h"]
+    file_w = ceil(attrs["w"] / sf) if attrs["w"] < BASE_TILE * sf else BASE_TILE
+    file_h = floor(attrs["h"] / sf) if attrs["h"] < BASE_TILE * sf else BASE_TILE
+    target_dir = f"{OUTPUT_DIR}/{real_x},{real_y},{real_w},{real_h}/{file_w},/0"
     os.makedirs(target_dir)
-    os.rename(i["filename"], target_dir + "/default.jpg")
+    res = os.system(
+        f"convert {i['filename']} -resize {file_w}x{file_h} {target_dir}/default.jpg"
+    )
 
 downsize_calls = []
 for df in DOWNSIZING_FACTORS:
     new_w = ceil(orig_dims[0] * 1 / pow(2, df))
     new_h = ceil(orig_dims[1] * 1 / pow(2, df))
     downsize_calls.append(
-        f"convert {SOURCE_IMAGE} -adaptive-resize {new_w}x{new_h} {OUTPUT_DIR}/{new_w},{new_h}.jpg"
+        f"convert {SOURCE_IMAGE} -resize {new_w}x{new_h} {OUTPUT_DIR}/temp_resizes/{new_w},{new_h}.jpg"
     )
 
 for call in tqdm(downsize_calls, desc="Downsizing"):
     code = os.system(call)
 
-full_results = glob(OUTPUT_DIR + "/*.jpg")
+full_results = glob(OUTPUT_DIR + "/temp_resizes/*.jpg")
 
 full_dims = []
 
