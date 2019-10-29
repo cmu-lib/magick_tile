@@ -37,7 +37,7 @@ p = 2
 cont = True
 while cont:
     DOWNSIZING_FACTORS.append(p)
-    cont = (floor(min_dim / pow(2, p))) > 1
+    cont = (floor(min_dim / pow(2, p))) > BASE_TILE
     p = p + 1
 
 
