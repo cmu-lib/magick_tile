@@ -117,7 +117,7 @@ manifest = {
     "protocol": "http://iiif.io/api/image",
     "sizes": full_dims,
     "tiles": [
-        {"height": BASE_TILE, "scaleFactors": SCALING_FACTORS, "width": BASE_TILE}
+        {"scaleFactors": SCALING_FACTORS, "width": BASE_TILE}
     ],
     "width": orig_dims[0],
     "height": orig_dims[1],
