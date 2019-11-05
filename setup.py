@@ -11,7 +11,7 @@ if shutil.which('convert') is None:
     sys.exit("Please install ImageMagick, and make sure it is in your system path.")
 
 setuptools.setup(
-    name = 'magick-tile',
+    name = 'magick_tile',
     version = version,
     url = 'https://github.com/cmu-lib/magick_tile/',
     author = 'Matthew Lincoln',
