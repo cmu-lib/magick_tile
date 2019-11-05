@@ -11,7 +11,7 @@ This takes inspiration heavily from https://github.com/zimeon/iiif/blob/master/i
 
 ## Run
 
-```sh
+```
 python3 magick_tile.py --help
 
 > Usage: magick_tile.py [options] file (-h for help)
@@ -23,11 +23,12 @@ python3 magick_tile.py --help
 >   -o OUTPUT, --output=OUTPUT
 >                         Destination directory for tiles
 >   -i IDENTIFIER, --identifier=IDENTIFIER
->                         Image identifier for info.json
+>                         Image identifier to be written to final info.json
+>                         (e.g. https://example.com/iiif/my_image)
 >   -t TILESIZE, --tilesize=TILESIZE
 >                         Tile size to produce [default 256]
 
-python3 magick_tile.py -o tiled_image_dir -i tiled_image apple.jpg
+python3 magick_tile.py -o apple/ -i "https://example.com/iiif/apple" apple.jpg
 ```
 
 This will create and populate the specified output directory with tiles from a given image.
