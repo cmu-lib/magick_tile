@@ -2,6 +2,8 @@
 
 This python script relies on Imagemagick to efficiently create derivative tiles of a very large image, and structure them into directories compliant with [IIIF Level 0](https://iiif.io/api/image/2.1/compliance/#level-0-compliance) specification for static sites.
 
+This takes inspiration heavily from https://github.com/zimeon/iiif/blob/master/iiif_static.py, but uses ImageMagick rather than Pillow in order to speed up generation at the expense of a less flexible treatment of images.
+
 ## Prerequisites
 
 - Python 3
@@ -9,11 +11,26 @@ This python script relies on Imagemagick to efficiently create derivative tiles 
 
 ## Run
 
-```
-python3 fast_tile.py
+```sh
+python3 magick_tile.py --help
+
+> Usage: magick_tile.py [options] file (-h for help)
+>
+> IIIF Image API Level-0 static file generator
+>
+> Options:
+>   -h, --help            show this help message and exit
+>   -o OUTPUT, --output=OUTPUT
+>                         Destination directory for tiles
+>   -i IDENTIFIER, --identifier=IDENTIFIER
+>                         Image identifier for info.json
+>   -t TILESIZE, --tilesize=TILESIZE
+>                         Tile size to produce [default 256]
+
+python3 magick_tile.py -o tiled_image_dir -i tiled_image apple.jpg
 ```
 
-This will create and populate an `out/` directory.
+This will create and populate the specified output directory with tiles from a given image.
 
 N.b. because several of the Imagemagick utilities called here already utilize multiple cores, returns for running this script in parallel diminish rapidly.
 

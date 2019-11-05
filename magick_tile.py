@@ -1,5 +1,5 @@
 """
-This takes inspiration heavily from https://github.com/zimeon/iiif/blob/master/iiif_static.py, but uses ImageMagick rather than Pillow in order to speed up calculations at the expense of a stricter treatment of images.
+This takes inspiration heavily from https://github.com/zimeon/iiif/blob/master/iiif_static.py
 """
 
 from glob import glob
@@ -133,6 +133,8 @@ class Tiler:
     def generate_info(self):
         """
         Generate the info.json for this image
+
+        TODO: add ability to list arbitrary endpoint features re https://iiif.io/api/image/2.1/#profile-description
         """
         return {
             "@context": "http://iiif.io/api/image/2/context.json",
@@ -181,7 +183,11 @@ def main():
     )
 
     p.add_option(
-        "--identifier", "-i", default=None, action="store", help="Image identifier"
+        "--identifier",
+        "-i",
+        default=None,
+        action="store",
+        help="Image identifier to be written to final info.json",
     )
 
     p.add_option(
@@ -190,7 +196,7 @@ def main():
         default=256,
         action="store",
         type="int",
-        help="Tile size to produce [default [%default]",
+        help="Tile size to produce [default %default]",
     )
 
     (opt, sources) = p.parse_args()
