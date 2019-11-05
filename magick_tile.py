@@ -202,7 +202,7 @@ def main():
         "-i",
         default=None,
         action="store",
-        help="Image identifier to be written to final info.json",
+        help="Image identifier to be written to final info.json (e.g. https://example.com/iiif/my_image)",
     )
 
     p.add_option(
