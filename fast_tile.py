@@ -12,6 +12,9 @@ class Tiler:
     BASE_SMALLER_SIZES = (16, 32, 64, 128, 256, 512, 800, 1024, 2048)
 
     def __init__(self, sourcepath, output, tile_size=256):
+        if not self.is_magick_installed():
+            raise EnvironmentError
+
         self.sourcepath = sourcepath
         self.output = output
         self.tile_size = tile_size
@@ -32,6 +35,17 @@ class Tiler:
             self.min_dim = self.orig_dims[1]
         else:
             self.min_dim = self.orig_dims[0]
+
+    @staticmethod
+    def is_magick_installed():
+        """
+        Confirm that Imagemagick is installed and on $PATH
+        """
+        try:
+            subprocess.run(["convert", "--version"])
+            return true
+        except:
+            return false
 
     def get_scaling_factors(self):
         return [
