@@ -7,7 +7,7 @@ This takes inspiration heavily from https://github.com/zimeon/iiif/blob/master/i
 ## Prerequisites
 
 - Python 3
-- Imagemagick must be available on your path
+- [Imagemagick](https://imagemagick.org/index.php) must be available on your path
 
 ## Run
 
