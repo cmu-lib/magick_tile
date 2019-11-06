@@ -1,3 +1,6 @@
 out/
 *.png
 *.jpg
+build
+dist
+magick_tile.egg-info
