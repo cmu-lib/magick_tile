@@ -2,16 +2,17 @@
 This takes inspiration heavily from https://github.com/zimeon/iiif/blob/master/iiif_static.py
 """
 
-from glob import glob
-from tempfile import TemporaryDirectory
 import os
+import re
 import sys
-import subprocess
-from math import floor, ceil
 import json
-from tqdm import tqdm
 import optparse
+import subprocess
 
+from tqdm import tqdm
+from glob import glob
+from math import floor, ceil
+from tempfile import TemporaryDirectory
 
 class Tiler:
     # TODO replace this with a much smarter system for iterating potential scaling and reduction sizes
@@ -29,16 +30,7 @@ class Tiler:
         self.tile_size = tile_size
 
         # Measure the original dimensions of the image, and find the smaller of the two
-        self.orig_dims = [
-            int(d)
-            for d in subprocess.run(
-                ["identify", "-ping", self.sourcepath], stdout=subprocess.PIPE
-            )
-            .stdout.decode("utf-8")
-            .split(" ")[2]
-            .split("x")
-        ]
-
+        self.orig_dims = self.get_dimensions()
         if self.orig_dims[0] > self.orig_dims[1]:
             self.min_dim = self.orig_dims[1]
         else:
@@ -177,6 +169,15 @@ class Tiler:
         self.generate_cropped_tiles(output_dir)
         self.generate_reduced_versions(output_dir)
         self.write_info(output_dir)
+
+    def get_dimensions(self):
+        """
+        Get the dimensions of the sourcepath as [x, y]
+        """
+        r = subprocess.run(['identify', '-ping', self.sourcepath], capture_output=True)
+        s = r.stdout.decode('utf-8')
+        dims = re.search('(\d+)x(\d+)', s).groups()
+        return [int(d) for d in dims]
 
 
 def main():
