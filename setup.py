@@ -2,7 +2,7 @@ import sys
 import shutil
 import setuptools
 
-version = "0.0.2"
+version = "0.0.3"
 
 with open("README.md") as f:
     long_description = f.read()
