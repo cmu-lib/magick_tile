@@ -174,7 +174,7 @@ class Tiler:
         """
         Get the dimensions of the sourcepath as [x, y]
         """
-        r = subprocess.run(['identify', '-ping', self.sourcepath], capture_output=True)
+        r = subprocess.run(['identify', '-ping', self.sourcepath], stdout=subprocess.PIPE)
         s = r.stdout.decode('utf-8')
         dims = re.search('(\d+)x(\d+)', s).groups()
         return [int(d) for d in dims]
