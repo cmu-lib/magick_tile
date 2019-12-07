@@ -103,7 +103,8 @@ class Tiler:
             file_w = ceil(w / sf) if w < self.tile_size * sf else self.tile_size
             file_h = floor(h / sf) if h < self.tile_size * sf else self.tile_size
             target_dir = f"{output_dir}/{x},{y},{w},{h}/{file_w},/0"
-            os.makedirs(target_dir)
+            if not os.path.isdir(target_dir):
+                os.makedirs(target_dir)
             res = subprocess.call(
                 [
                     "convert",
