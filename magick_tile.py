@@ -103,7 +103,8 @@ class Tiler:
             file_w = ceil(w / sf) if w < self.tile_size * sf else self.tile_size
             file_h = floor(h / sf) if h < self.tile_size * sf else self.tile_size
             target_dir = f"{output_dir}/{x},{y},{w},{h}/{file_w},/0"
-            os.makedirs(target_dir)
+            if not os.path.isdir(target_dir):
+                os.makedirs(target_dir)
             res = subprocess.call(
                 [
                     "convert",
@@ -174,7 +175,7 @@ class Tiler:
         """
         Get the dimensions of the sourcepath as [x, y]
         """
-        r = subprocess.run(['identify', '-ping', self.sourcepath], capture_output=True)
+        r = subprocess.run(['identify', '-ping', self.sourcepath], stdout=subprocess.PIPE)
         s = r.stdout.decode('utf-8')
         dims = re.search('(\d+)x(\d+)', s).groups()
         return [int(d) for d in dims]
